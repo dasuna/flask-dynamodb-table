@@ -10,12 +10,13 @@ def index():
     #return 'Hello, World!'
 
 
-@app.route('/create') 
+@app.route('/create-table', methods=["POST"]) 
 def create_table():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table_name = request.form["tableName"]
 
     table = dynamodb.create_table(
-        TableName='StudentDetails',
+        TableName=table_name,
         KeySchema=[
             {
                 'AttributeName': 'regNo',
@@ -46,7 +47,7 @@ def create_table():
     return "Data written successfully"
 
 
-@app.route('/update') 
+@app.route('/put-item') 
 def update_table():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table = dynamodb.Table('StudentDetails')
@@ -62,13 +63,14 @@ def update_table():
 
 
 
-@app.route('/update-via-form', methods=["POST"]) 
+@app.route('/put-via-form', methods=["POST"]) 
 def update_table_via_form():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table('StudentDetails')
+    table = dynamodb.Table('student') # replace 'student' with whatever your table name
     
     # Get the data from the request body
     data = request.form.to_dict()
+    # Put the item to the database
     table.put_item(Item=data)
 
     
