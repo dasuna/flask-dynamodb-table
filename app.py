@@ -45,8 +45,14 @@ def create_table():
         }
     )
 
-    print("Table status:", table.table_status)
-    return "Data written successfully"
+    # Wait until the table is created
+    table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
+
+    # Check the table status
+    if table.table_status == 'ACTIVE':
+        return f"Table '{table_name}' created successfully"
+    else:
+        return f"Error creating table. Table status: {table.table_status}"
 
     
 if __name__ == '__main__':
