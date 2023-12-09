@@ -14,26 +14,28 @@ def index():
 def create_table():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     table_name = request.form["tableName"]
+    partition_key = request.form["partitionKey"]
+    sort_key = request.form["sortKey"]
 
     table = dynamodb.create_table(
         TableName=table_name,
         KeySchema=[
             {
-                'AttributeName': 'regNo',
+                'AttributeName': partition_key,
                 'KeyType': 'HASH'  #Partition key
             },
             {
-                'AttributeName': 'name',
+                'AttributeName': sort_key,
                 'KeyType': 'RANGE'  #Sort key
             }
         ],
         AttributeDefinitions=[
             {
-                'AttributeName': 'regNo',
+                'AttributeName': partition_key,
                 'AttributeType': 'S'
             },
             {
-                'AttributeName': 'name',
+                'AttributeName': sort_key,
                 'AttributeType': 'S'
             },
         ],
@@ -46,36 +48,6 @@ def create_table():
     print("Table status:", table.table_status)
     return "Data written successfully"
 
-
-@app.route('/put-item') 
-def update_table():
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table('StudentDetails')
-    item = {
-      'regNo': '001',
-      'name': 'Jane',
-      'age': 26
-    }
-    
-    table.put_item(Item=item)
-    
-    return "Sucessfully updated"
-
-
-
-@app.route('/put-via-form', methods=["POST"]) 
-def update_table_via_form():
-    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-    table = dynamodb.Table('student') # replace 'student' with whatever your table name
-    
-    # Get the data from the request body
-    data = request.form.to_dict()
-    # Put the item to the database
-    table.put_item(Item=data)
-
-    
-    return "Sucessfully updated"
-    
     
 if __name__ == '__main__':
     app.run(debug=True,port=8080,host='0.0.0.0')
